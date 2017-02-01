@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
-
 import { LocationService } from './location.service';
 import { TimeAcquisitionService } from './time-acquisition.service';
 import { TimeConversionService } from './time-conversion.service';
+import { SunRiseSet } from './sunriseset';
+import { Edotime } from './edotime';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,10 @@ export class AppComponent implements OnInit {
   longitude: string;
   sunRise: string;
   sunSet: string;
+  edotimeAxis: Edotime[] = [];
+  edotimeNow: Edotime;
+
+  private sunRiseSet: SunRiseSet;
 
   constructor(
     private locationService: LocationService,
@@ -24,25 +29,40 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    let sunRiseSet: string; // y:m&y:m 日の出時刻&日の入り時刻
+    this.getLocation();
+  }
+
+  private getLocation() {
+    // 位置情報を取得する
     this.locationService.getLocation().subscribe(location => {
-      // 位置情報を取得する
-      console.log('latitude: ' + location.coords.latitude);
-      console.log('longitude: ' + location.coords.longitude);
       this.latitude = location.coords.latitude;
       this.longitude = location.coords.longitude;
       // 日の出・日の入り時刻を取得する
-      sunRiseSet = this.timeAcquisitionService.getSunRiseSetTime(
-        new Date(),
-        this.latitude,
-        this.longitude);
-      const str = sunRiseSet.split('&');
-      this.sunRise = str[0];
-      this.sunSet = str[1];
-      console.log(sunRiseSet);
+      this.getSunRiseSet();
     });
+  }
+
+  /**
+   * 日の出・日の入り時刻を取得する
+   */
+  private getSunRiseSet() {
+    this.timeAcquisitionService.getSunRiseSetTime(
+      new Date(),
+      this.latitude,
+      this.longitude
+    ).then(sunRiseSet => {
+      this.sunRiseSet = sunRiseSet;
+      this.sunRise = this.sunRiseSet.sunrise;
+      this.sunSet = this.sunRiseSet.sunset;
+      this.getEdotimeAxis();
+    }).catch(error => console.log(error));
+  }
 
 
-    // 江戸時刻を計算する
+  // 江戸時刻の軸を取得する
+  private getEdotimeAxis() {
+    this.edotimeAxis = this.timeConversionService.getEdoTimeAxis(this.sunRise, this.sunSet);
   }
 }
+
+
