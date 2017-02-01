@@ -8,10 +8,11 @@ import { AppComponent } from './app.component';
 import { LocationService } from './location.service';
 import { TimeAcquisitionService } from './time-acquisition.service';
 import { TimeConversionService } from './time-conversion.service';
-
+import { GoogleChartDirective } from './directives/angular2-google-chart.directive';
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    GoogleChartDirective
   ],
   imports: [
     BrowserModule,

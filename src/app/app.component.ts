@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-
 import { LocationService } from './location.service';
 import { TimeAcquisitionService } from './time-acquisition.service';
 import { TimeConversionService } from './time-conversion.service';
@@ -19,6 +18,20 @@ export class AppComponent implements OnInit {
   sunSet: string;
   edotimeAxis: Edotime[] = [];
   edotimeNow: Edotime;
+
+  pie_ChartData = [
+    ['Task', 'Hours per Day'],
+    ['Work', 11],
+    ['Eat', 2],
+    ['Commute', 2],
+    ['Watch TV', 2],
+    ['Sleep', 7]];
+
+  pie_ChartOptions = {
+    title: 'My Daily Activities',
+    width: 900,
+    height: 500
+  };
 
   private sunRiseSet: SunRiseSet;
 
