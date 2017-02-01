@@ -32,17 +32,26 @@ export class TimeConversionService {
     // 昼間の各刻を計算する
     const daytimeMinuteInterval = (sunsetMinutes - sunriseMinutes) / 6;
     const daytimeAngleInterval = daytimeMinuteInterval * this.anglePerMinute;
+    console.log('sunriseMinutes => ' + sunriseMinutes);
+    console.log('sunsetMinutes => ' + sunsetMinutes);
+    console.log('daytimeMinuteInterval => ' + daytimeMinuteInterval);
+    console.log('daytimeAngleInterval => ' + daytimeAngleInterval);
 
     for (let i = 0; i < 6; i++) {
+      let angle = 0;
       if (i === 0) {
-        this.edotimes[i].angle = sunriseMinutes * this.anglePerMinute;
+        angle = sunriseMinutes * this.anglePerMinute;
       } else {
-        this.edotimes[i].angle = this.edotimes[i - 1].angle + daytimeAngleInterval;
+        angle = this.edotimes[i - 1].angle + daytimeAngleInterval;
       }
-      this.edotimes[i].axis = true;
-      this.edotimes[i].daytime = true;
-      this.edotimes[i].eto = this.etos[i];
-      this.edotimes[i].koku = this.kokus[i];
+      this.edotimes[i] = {
+        angle: angle,
+        daytime: true,
+        axis: true,
+        eto: this.etos[i],
+        koku: this.kokus[i],
+        presentTime: ''
+      };
     }
 
     // 夜間の各刻を計算する
@@ -51,11 +60,22 @@ export class TimeConversionService {
 
     for (let i = 0; i < 6; i++) {
       const j = i + 6;
-      this.edotimes[j].angle = this.edotimes[j - 1].angle + nighttimeAngleInterval;
-      this.edotimes[j].axis = true;
-      this.edotimes[j].daytime = false;
-      this.edotimes[j].eto = this.etos[j];
-      this.edotimes[j].koku = this.kokus[i];
+      let angle = this.edotimes[j - 1].angle + nighttimeAngleInterval;
+      if (angle > 360) {
+        angle = angle - 360;
+      }
+      this.edotimes[j] = {
+        angle: angle,
+        daytime: false,
+        axis: true,
+        eto: this.etos[j],
+        koku: this.kokus[i],
+        presentTime: ''
+      };
+    }
+    console.log('this.edotimes.length => ' + this.edotimes.length);
+    for (let i = 0; i < this.edotimes.length; i++) {
+      console.log(this.edotimes[i]);
     }
     return this.edotimes;
   }
