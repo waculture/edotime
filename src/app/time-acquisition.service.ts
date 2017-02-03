@@ -5,6 +5,7 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 
 import { SunRiseSet } from './sunriseset';
+import { DateService } from './date.service';
 
 /**
  * 日の出・日の入り時刻を計算する。
@@ -20,7 +21,10 @@ export class TimeAcquisitionService {
   private url = 'http://localhost:1323/sunriseset';
   private sunRiseSet: SunRiseSet;
 
-  constructor(private http: Http) { }
+  constructor(
+    private http: Http,
+    private dateService: DateService
+    ) { }
 
   /**
    * 日の出・日の入り時刻を取得する
@@ -32,7 +36,7 @@ export class TimeAcquisitionService {
    * return: hhmm&hhmm
    */
   public getSunRiseSetTime(date: any, lat: string, lng: string): Promise<SunRiseSet> {
-    const argDate = this.formatDate(date, 'YYYY-MM-DD');
+    const argDate = this.dateService.formatDate(date, 'YYYY-MM-DD');
     this.url += '?date=' + argDate + '&latitude=' + lat + '&longitude=' + lng;
     return this.http.get(this.url)
       .toPromise()
@@ -48,27 +52,4 @@ export class TimeAcquisitionService {
     return Promise.reject(error.message || error);
   }
 
-  /**
-   * 日付を任意の形式に変換する
-   * 
-   */
-  private formatDate(date: any, format: string): string {
-    if (!format) {
-      format = 'YYYY-MM-DD hh:mm:ss.SSS';
-    }
-    format = format.replace(/YYYY/g, date.getFullYear());
-    format = format.replace(/MM/g, ('0' + (date.getMonth() + 1)).slice(-2));
-    format = format.replace(/DD/g, ('0' + date.getDate()).slice(-2));
-    format = format.replace(/hh/g, ('0' + date.getHours()).slice(-2));
-    format = format.replace(/mm/g, ('0' + date.getMinutes()).slice(-2));
-    format = format.replace(/ss/g, ('0' + date.getSeconds()).slice(-2));
-    if (format.match(/S/g)) {
-      const milliSeconds = ('00' + date.getMilliseconds()).slice(-3);
-      const length = format.match(/S/g).length;
-      for (let i = 0; i < length; i++) {
-        format = format.replace(/S/, milliSeconds.substring(i, i + 1));
-      }
-    }
-    return format;
-  }
 }

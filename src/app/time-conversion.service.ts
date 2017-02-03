@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Edotime } from './edotime';
+import { DateService } from './date.service';
 
 /**
  * (1)24時間を一つの円で表す円形表示のための各刻の位置情報を計算する。
@@ -16,7 +17,9 @@ export class TimeConversionService {
   private kokus: string[] = ['六つ', '五つ', '四つ', '九つ', '八つ', '七つ'];
   private etos: string[] = ['卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑', '寅'];
 
-  constructor() { }
+  constructor(
+    private dateService: DateService
+  ) { }
 
   /**
    * 円形表示のための各刻の位置情報を計算する。
@@ -26,8 +29,8 @@ export class TimeConversionService {
    * @return {Edotime[]} edotimes (円形表示のための各刻の位置情報)
    */
   public getEdoTimeAxis(sunrise: string, sunset: string): Edotime[] {
-    const sunriseMinutes = this.time2minutes(sunrise) - 30; // 日の出の30分前を明け六つとする
-    const sunsetMinutes = this.time2minutes(sunset) + 30;   // 日の入りの30分後を暮れ六つとする
+    const sunriseMinutes = this.dateService.time2minutes(sunrise) - 30; // 日の出の30分前を明け六つとする
+    const sunsetMinutes = this.dateService.time2minutes(sunset) + 30;   // 日の入りの30分後を暮れ六つとする
 
     // 昼間の各刻を計算する
     const daytimeMinuteInterval = (sunsetMinutes - sunriseMinutes) / 6;
@@ -39,10 +42,13 @@ export class TimeConversionService {
 
     for (let i = 0; i < 6; i++) {
       let angle = 0;
+      let startTime = 0;
       if (i === 0) {
         angle = sunriseMinutes * this.anglePerMinute;
+        startTime = sunriseMinutes;
       } else {
         angle = this.edotimes[i - 1].angle + daytimeAngleInterval;
+        startTime = this.edotimes[i - 1].startTime + daytimeMinuteInterval;
       }
       this.edotimes[i] = {
         angle: angle,
@@ -50,7 +56,9 @@ export class TimeConversionService {
         axis: true,
         eto: this.etos[i],
         koku: this.kokus[i],
-        presentTime: ''
+        minutesInterval: daytimeMinuteInterval,
+        startTime: startTime,
+        startTimeHM: this.dateService.minutes2time(startTime)
       };
     }
 
@@ -64,13 +72,19 @@ export class TimeConversionService {
       if (angle > 360) {
         angle = angle - 360;
       }
+      let startTime = this.edotimes[j - 1].startTime + nighttimeMinuteInterval;
+      if (startTime > 24 * 60) {
+        startTime = startTime - 24 * 60;
+      }
       this.edotimes[j] = {
         angle: angle,
         daytime: false,
         axis: true,
         eto: this.etos[j],
         koku: this.kokus[i],
-        presentTime: ''
+        minutesInterval: nighttimeMinuteInterval,
+        startTime: startTime,
+        startTimeHM: this.dateService.minutes2time(startTime)
       };
     }
     console.log('this.edotimes.length => ' + this.edotimes.length);
@@ -78,20 +92,6 @@ export class TimeConversionService {
       console.log(this.edotimes[i]);
     }
     return this.edotimes;
-  }
-
-  /**
-   * 時刻を0時からの分に変換する。
-   * 
-   * @param {string} time （時刻　hh:mm:ss）
-   * @return {number} totalMinutes （0時からの分）
-   */
-  private time2minutes(time: string): number {
-    const times = time.split(':');
-    const hours = parseInt(times[0], 10);
-    const minutes = parseInt(times[1], 10);
-    const totalMinutes = hours * 60 + minutes;
-    return totalMinutes;
   }
 
 }

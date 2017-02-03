@@ -4,5 +4,7 @@ export class Edotime {
     axis: boolean;          // true: 基準線（軸）、false: 基準線（軸）でない
     angle: number;          // 0～360、0時を0度とした場合の右回りの角度
     eto: string;            // 卯・辰・巳・午・未・申・酉・戌・亥・子・丑・寅
-    presentTime: string;    // 現代の現在時刻　hh:mm:ss
+    minutesInterval: number; // 刻の時間（分）
+    startTime: number;      // この刻の開始(0時からの分)
+    startTimeHM: string;    // この刻の開始時刻(hh:mm)
 }

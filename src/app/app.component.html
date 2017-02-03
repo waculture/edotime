@@ -1,19 +1,38 @@
-<div id='location'>
-  緯度=>{{latitude}}
-  <br> 経度=>{{longitude}}
-  <br> 日の出=>{{sunRise}}
-  <br> 日の入り=>{{sunSet}}
-</div>
-<ul>
-  <li *ngFor="let edotime of edotimeAxis">
-    <span>{{edotime.koku}}</span>
-    <span>{{edotime.daytime}}</span>
-    <span>{{edotime.axis}}</span>
-    <span>{{edotime.angle}}</span>
-    <span>{{edotime.eto}}</span>
-    <span>{{edotime.presentTime}}</span>
-  </li>
-</ul>
-<div id="pie_chart" [chartData]="pie_ChartData" 
-                    [chartOptions] = "pie_ChartOptions" 
-                    chartType="PieChart" GoogleChartDirective></div> 
+<main>
+  <div class='flex-left'>
+    <div id='location'>
+      緯度=>{{latitude}}
+      <br> 経度=>{{longitude}}
+      <br> 日の出=>{{sunRise}}
+      <br> 日の入り=>{{sunSet}}
+      <br> 現在時刻=>{{currentTime | date:'H:m'}}
+    </div>
+    <div>
+      <table>
+        <tr>
+          <th>刻</th>
+          <th>day</th>
+          <th>axis</th>
+          <th>角度</th>
+          <th>干支</th>
+          <th>分間隔</th>
+          <th>開始分</th>
+          <th>開始時刻</th>
+        </tr>
+        <tr *ngFor="let edotime of edotimeAxis">
+          <td align='center'>{{edotime.koku}}</td>
+          <td align='center'>{{edotime.daytime}}</td>
+          <td align='center'>{{edotime.axis}}</td>
+          <td align='right'>{{edotime.angle | number:'1.1-1'}}</td>
+          <td align='center'>{{edotime.eto}}</td>
+          <td align='right'>{{edotime.minutesInterval | number:'1.1-1'}}</td>
+          <td align='right'>{{edotime.startTime | number:'1.1-1'}}</td>
+          <td align='center'>{{edotime.startTimeHM}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class='flex-right'>
+    <div id="pie_chart" [chartData]="pie_ChartData" [chartOptions]="pie_ChartOptions" chartType="PieChart" GoogleChartDirective></div>
+  </div>
+</main>
